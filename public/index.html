@@ -5,21 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Outdoor Living AI Designer</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { margin: 0; padding: 0; }
-  </style>
 </head>
 <body>
   <div id="root"></div>
   
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   
-  <script type="text/babel">
-    const { useState } = React;
+  <script>
+    const { useState, createElement: e } = React;
 
-    function OutdoorRenderer() {
+    function App() {
       const [selectedStyle, setSelectedStyle] = useState('modern');
       const [selectedFeatures, setSelectedFeatures] = useState([]);
       const [isGenerating, setIsGenerating] = useState(false);
@@ -38,7 +34,7 @@
       const features = [
         { id: 'kitchen', name: 'Outdoor Kitchen' },
         { id: 'patio', name: 'Covered Patio' },
-        { id: 'fireplace', name: 'Fireplace/Fire Pit' },
+        { id: 'fireplace', name: 'Fireplace or Fire Pit' },
         { id: 'seating', name: 'Built-in Seating' },
         { id: 'pergola', name: 'Pergola' },
         { id: 'lighting', name: 'Ambient Lighting' }
@@ -46,9 +42,7 @@
 
       const toggleFeature = (featureId) => {
         setSelectedFeatures(prev => 
-          prev.includes(featureId) 
-            ? prev.filter(f => f !== featureId)
-            : [...prev, featureId]
+          prev.includes(featureId) ? prev.filter(f => f !== featureId) : [...prev, featureId]
         );
       };
 
@@ -58,7 +52,6 @@
           setShowApiInput(true);
           return;
         }
-
         if (selectedFeatures.length === 0) {
           setError('Please select at least one feature to add');
           return;
@@ -68,23 +61,39 @@
         setError(null);
 
         try {
-          const featureText = selectedFeatures
-            .map(id => features.find(f => f.id === id).name.toLowerCase())
-            .join(', ');
-
-          const styleDescriptions = {
+          const featureText = selectedFeatures.map(id => features.find(f => f.id === id).name.toLowerCase()).join(', ');
+          const styleDesc = {
             modern: 'with clean lines, contemporary furniture, sleek materials, and minimalist aesthetic',
             rustic: 'with natural stone, reclaimed wood, earthy tones, and organic textures',
             mediterranean: 'with warm terracotta, stucco walls, arched elements, and elegant tile work',
             contemporary: 'with sophisticated materials, bold architectural features, and upscale finishes'
           };
-
-          const prompt = `A photorealistic architectural rendering of a high-end residential outdoor living space featuring ${featureText}. The design should be ${selectedStyle} style ${styleDescriptions[selectedStyle]}. Professional landscape design with lush plants, proper lighting, and luxury materials. The space should look inviting, functional, and magazine-worthy. Bright daylight, sharp details, professional photography quality.`;
+          const prompt = 'A photorealistic architectural rendering of a high-end residential outdoor living space featuring ' + featureText + '. The design should be ' + selectedStyle + ' style ' + styleDesc[selectedStyle] + '. Professional landscape design with lush plants, proper lighting, and luxury materials. The space should look inviting, functional, and magazine-worthy. Bright daylight, sharp details, professional photography quality.';
 
           const response = await fetch('/api/generate', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              apiKey: apiKey,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ apiKey: apiKey, prompt: prompt })
+          });
+
+          const data = await response.json();
+          if (data.error) throw new Error(data.error.message || 'Failed to generate rendering');
+          if (data.data && data.data[0] && data.data[0].url) {
+            setGeneratedImage(data.data[0].url);
+          } else {
+            throw new Error('No image returned from API');
+          }
+        } catch (err) {
+          setError(err.message || 'Failed to generate rendering. Please check your API key and try again.');
+        } finally {
+          setIsGenerating(false);
+        }
+      };
+
+      const downloadImage = async () => {
+        if (!generatedImage) return;
+        try {
+          const response = await fetch(generatedImage);
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createEle
