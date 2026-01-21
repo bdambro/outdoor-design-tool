@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Outdoor Living AI Designer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { margin: 0; padding: 0; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <script type="text/babel">
+    const { useState } = React;
+
+    function OutdoorRenderer() {
+      const [uploadedImage, setUploadedImage] = useState(null);
+      const [selectedStyle, setSelectedStyle] = useState('modern');
+      const [selectedFeatures, setSelectedFeatures] = useState([]);
+      const [isGenerating, setIsGenerating] = useState(false);
+      const [generatedImage, setGeneratedImage] = useState(null);
+      const [error, setError] = useState(null);
+      const [apiKey, setApiKey] = useState('');
+      const [showApiInput, setShowApiInput] = useState(true);
+
+      const styles = [
+        { id: 'modern', name: 'Modern', desc: 'Clean lines, minimalist' },
+        { id: 'rustic', name: 'Rustic', desc: 'Natural stone, wood' },
+        { id: 'mediterranean', name: 'Mediterranean', desc: 'Warm, elegant' },
+        { id: 'contemporary', name: 'Contemporary', desc: 'Sleek, sophisticated' }
+      ];
+
+      const features = [
+        { id: 'kitchen', name: 'Outdoor Kitchen', icon: '🍳' },
+        { id: 'patio', name: 'Covered Patio', icon: '⛱️' },
+        { id: 'firep
