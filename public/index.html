@@ -20,7 +20,6 @@
     const { useState } = React;
 
     function OutdoorRenderer() {
-      const [uploadedImage, setUploadedImage] = useState(null);
       const [selectedStyle, setSelectedStyle] = useState('modern');
       const [selectedFeatures, setSelectedFeatures] = useState([]);
       const [isGenerating, setIsGenerating] = useState(false);
@@ -37,6 +36,55 @@
       ];
 
       const features = [
-        { id: 'kitchen', name: 'Outdoor Kitchen', icon: '🍳' },
-        { id: 'patio', name: 'Covered Patio', icon: '⛱️' },
-        { id: 'firep
+        { id: 'kitchen', name: 'Outdoor Kitchen' },
+        { id: 'patio', name: 'Covered Patio' },
+        { id: 'fireplace', name: 'Fireplace/Fire Pit' },
+        { id: 'seating', name: 'Built-in Seating' },
+        { id: 'pergola', name: 'Pergola' },
+        { id: 'lighting', name: 'Ambient Lighting' }
+      ];
+
+      const toggleFeature = (featureId) => {
+        setSelectedFeatures(prev => 
+          prev.includes(featureId) 
+            ? prev.filter(f => f !== featureId)
+            : [...prev, featureId]
+        );
+      };
+
+      const generateRendering = async () => {
+        if (!apiKey) {
+          setError('Please enter your OpenAI API key first');
+          setShowApiInput(true);
+          return;
+        }
+
+        if (selectedFeatures.length === 0) {
+          setError('Please select at least one feature to add');
+          return;
+        }
+
+        setIsGenerating(true);
+        setError(null);
+
+        try {
+          const featureText = selectedFeatures
+            .map(id => features.find(f => f.id === id).name.toLowerCase())
+            .join(', ');
+
+          const styleDescriptions = {
+            modern: 'with clean lines, contemporary furniture, sleek materials, and minimalist aesthetic',
+            rustic: 'with natural stone, reclaimed wood, earthy tones, and organic textures',
+            mediterranean: 'with warm terracotta, stucco walls, arched elements, and elegant tile work',
+            contemporary: 'with sophisticated materials, bold architectural features, and upscale finishes'
+          };
+
+          const prompt = `A photorealistic architectural rendering of a high-end residential outdoor living space featuring ${featureText}. The design should be ${selectedStyle} style ${styleDescriptions[selectedStyle]}. Professional landscape design with lush plants, proper lighting, and luxury materials. The space should look inviting, functional, and magazine-worthy. Bright daylight, sharp details, professional photography quality.`;
+
+          const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              apiKey: apiKey,
