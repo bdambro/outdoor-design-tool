@@ -7,124 +7,16 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-  <div id="root"></div>
-  
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-production.min.js"></script>
-  
-  <script>
-    const { useState, createElement: e } = React;
-
-    function App() {
-      const [selectedStyle, setSelectedStyle] = useState('modern');
-      const [selectedFeatures, setSelectedFeatures] = useState([]);
-      const [isGenerating, setIsGenerating] = useState(false);
-      const [generatedImage, setGeneratedImage] = useState(null);
-      const [error, setError] = useState(null);
-      const [apiKey, setApiKey] = useState('');
-      const [showApiInput, setShowApiInput] = useState(true);
-
-      const styles = [
-        { id: 'modern', name: 'Modern', desc: 'Clean lines, minimalist' },
-        { id: 'rustic', name: 'Rustic', desc: 'Natural stone, wood' },
-        { id: 'mediterranean', name: 'Mediterranean', desc: 'Warm, elegant' },
-        { id: 'contemporary', name: 'Contemporary', desc: 'Sleek, sophisticated' }
-      ];
-
-      const features = [
-        { id: 'kitchen', name: 'Outdoor Kitchen' },
-        { id: 'patio', name: 'Covered Patio' },
-        { id: 'fireplace', name: 'Fireplace or Fire Pit' },
-        { id: 'seating', name: 'Built-in Seating' },
-        { id: 'pergola', name: 'Pergola' },
-        { id: 'lighting', name: 'Ambient Lighting' }
-      ];
-
-      const toggleFeature = (featureId) => {
-        setSelectedFeatures(prev => 
-          prev.includes(featureId) ? prev.filter(f => f !== featureId) : [...prev, featureId]
-        );
-      };
-
-      const generateRendering = async () => {
-        if (!apiKey) {
-          setError('Please enter your OpenAI API key first');
-          setShowApiInput(true);
-          return;
-        }
-        if (selectedFeatures.length === 0) {
-          setError('Please select at least one feature to add');
-          return;
-        }
-
-        setIsGenerating(true);
-        setError(null);
-
-        try {
-          const featureText = selectedFeatures.map(id => features.find(f => f.id === id).name.toLowerCase()).join(', ');
-          const styleDesc = {
-            modern: 'with clean lines, contemporary furniture, sleek materials, and minimalist aesthetic',
-            rustic: 'with natural stone, reclaimed wood, earthy tones, and organic textures',
-            mediterranean: 'with warm terracotta, stucco walls, arched elements, and elegant tile work',
-            contemporary: 'with sophisticated materials, bold architectural features, and upscale finishes'
-          };
-          const prompt = 'A photorealistic architectural rendering of a high-end residential outdoor living space featuring ' + featureText + '. The design should be ' + selectedStyle + ' style ' + styleDesc[selectedStyle] + '. Professional landscape design with lush plants, proper lighting, and luxury materials. The space should look inviting, functional, and magazine-worthy. Bright daylight, sharp details, professional photography quality.';
-
-          const response = await fetch('https://api.openai.com/v1/images/generations', {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + apiKey
-            },
-            body: JSON.stringify({ 
-              model: 'dall-e-3',
-              prompt: prompt,
-              n: 1,
-              size: '1024x1024',
-              quality: 'standard'
-            })
-          });
-
-          const data = await response.json();
-          if (data.error) throw new Error(data.error.message || 'Failed to generate rendering');
-          if (data.data && data.data[0] && data.data[0].url) {
-            setGeneratedImage(data.data[0].url);
-          } else {
-            throw new Error('No image returned from API');
-          }
-        } catch (err) {
-          setError(err.message || 'Failed to generate rendering. Please check your API key and try again.');
-        } finally {
-          setIsGenerating(false);
-        }
-      };
-
-      const downloadImage = async () => {
-        if (!generatedImage) return;
-        const a = document.createElement('a');
-        a.href = generatedImage;
-        a.download = 'outdoor-design-' + Date.now() + '.png';
-        a.click();
-      };
-
-      return e('div', { className: 'min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4 md:p-8' },
-        e('div', { className: 'max-w-6xl mx-auto' },
-          e('div', { className: 'text-center mb-8' },
-            e('h1', { className: 'text-4xl font-bold text-gray-800 mb-2' }, 'Outdoor Living AI Designer'),
-            e('p', { className: 'text-gray-600' }, 'Transform your outdoor space in seconds')
-          ),
-          showApiInput && e('div', { className: 'bg-white rounded-2xl shadow-lg p-6 mb-6 border-2 border-blue-200' },
-            e('h3', { className: 'font-bold text-gray-800 mb-2' }, 'OpenAI API Key Required'),
-            e('p', { className: 'text-sm text-gray-600 mb-4' }, 'Get your API key from platform.openai.com/api-keys - Cost: about $0.04 per image'),
-            e('div', { className: 'flex gap-3' },
-              e('input', {
-                type: 'password',
-                placeholder: 'sk-proj-...',
-                value: apiKey,
-                onChange: (ev) => setApiKey(ev.target.value),
-                className: 'flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none'
-              }),
-              e('button', {
-                onClick: () => setShowApiInput(false),
-                disabled: !apiKey,
-                className: 'px-6 py-2 rounded-lg font-med
+  <div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-8">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-5xl font-bold text-center text-gray-800 mb-8">
+        ✨ Outdoor Living AI Designer
+      </h1>
+      <div class="bg-white rounded-2xl shadow-2xl p-8 text-center">
+        <p class="text-2xl text-gray-700 mb-4">🎉 Your tool is working!</p>
+        <p class="text-gray-600">Vercel is serving your site correctly.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
